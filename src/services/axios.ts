@@ -21,11 +21,9 @@ export class AxiosService {
         Accept: 'application/json',
         gatewayToken: gatewayToken
       },
-      withCredentials: true,
+      withCredentials: true
     });
 
     return instance;
   }
 }
-
-const axiosTest = new AxiosService(`${config.AUTH_BASE_URL}/api/vi/auth`, 'auth');

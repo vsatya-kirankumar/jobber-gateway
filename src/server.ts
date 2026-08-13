@@ -11,6 +11,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
+import { axiosAuthInstance } from '@gateway/services/api/auth.service';
 
 const SERVER_PORT = process.env.PORT || 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -47,11 +48,18 @@ export class GatewayServer {
     app.use(helmet());
     app.use(
       cors({
-        origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // allow requests from this origin
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] // allow these HTTP methods
-        //credentials: true, // allow cookies to be sent with requests
+        origin: config.CLIENT_URL || 'http://localhost:3000', // allow requests from this origin
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // allow these HTTP methods
+        credentials: true // allow cookies to be sent with requests
       })
     );
+
+    app.use((req: Request, _res: Response, next: NextFunction) => {
+      if (req.session?.jwt) {
+        axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+      }
+      next();
+    });
   }
 
   private standardMiddleware(app: Application): void {
@@ -69,29 +77,19 @@ export class GatewayServer {
   }
 
   private errorHandlingMiddleware(app: Application): void {
-    /* app.use('(.*)', (req: Request, res: Response, next: NextFunction) => {
+    app.use((req: Request, res: Response, _next: NextFunction) => {
       const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
       log.log('error', `Route not found: ${fullUrl}`);
       res.status(StatusCodes.NOT_FOUND).json({ message: 'Route not found' });
-      next();
-    }); */
-
-    app.use((req: Request, res: Response, next: NextFunction) => {
-      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-      log.log('error', `Route not found: ${fullUrl}`);
-      res.status(StatusCodes.NOT_FOUND).json({ message: 'Route not found' });
-      // Minor tip: since you are sending a response here, next() isn't strictly necessary,
-      // but leaving it won't break anything.
-      next();
+      //next();
     });
 
-    app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+    app.use((error: IErrorResponse, _req: Request, res: Response, _next: NextFunction) => {
       log.log('error', `Gateway Service Error: ${error.comingFrom}: `, error);
-
       if (error instanceof CustomError) {
         return res.status(error.statusCode).json(error.serializeErrors());
       }
-      next();
+      //next();
     });
   }
 

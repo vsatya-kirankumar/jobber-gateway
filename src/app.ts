@@ -1,4 +1,3 @@
-
 import express, { Express } from 'express';
 import { GatewayServer } from '@gateway/server';
 
