@@ -12,6 +12,8 @@ import { Logger } from 'winston';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
 import { axiosAuthInstance } from '@gateway/services/api/auth.service';
+import { axiosBuyerInstance } from '@gateway/services/api/buyer.service';
+import { axiosSellerInstance } from '@gateway/services/api/seller.service';
 
 const SERVER_PORT = process.env.PORT || 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -34,6 +36,15 @@ export class GatewayServer {
 
   public securityMiddleware(app: Application): void {
     app.set('trust proxy', 1); // first trust proxy
+
+    app.use(
+      cors({
+        origin: config.CLIENT_URL, // allow requests from this origin
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // allow these HTTP methods
+        credentials: true // allow cookies to be sent with requests
+      })
+    );
+
     app.use(
       cookieSession({
         name: 'session',
@@ -41,22 +52,17 @@ export class GatewayServer {
         maxAge: 24 * 7 * 60 * 60 * 1000, // 7 days
         secure: process.env.NODE_ENV === 'production', // set secure flag in production
         httpOnly: true, // prevent client-side JavaScript from accessing the cookie
-        sameSite: 'lax' // protect against CSRF attacks
+        sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax' // protect against CSRF attacks
       })
     );
     app.use(hpp());
     app.use(helmet());
-    app.use(
-      cors({
-        origin: config.CLIENT_URL || 'http://localhost:3000', // allow requests from this origin
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // allow these HTTP methods
-        credentials: true // allow cookies to be sent with requests
-      })
-    );
 
     app.use((req: Request, _res: Response, next: NextFunction) => {
       if (req.session?.jwt) {
         axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosBuyerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosSellerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
       }
       next();
     });

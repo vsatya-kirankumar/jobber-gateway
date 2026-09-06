@@ -1,13 +1,23 @@
-import { Request, Response } from 'express';
 import { authService } from '@gateway/services/api/auth.service';
-import { StatusCodes } from 'http-status-codes';
 import { AxiosResponse } from 'axios';
+import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 export class Signin {
   public async read(req: Request, res: Response): Promise<void> {
-    const response: AxiosResponse = await authService.signIn(req.body);
-    req.session = { jwt: response.data.token };
+    try {
+      const response: AxiosResponse = await authService.signIn(req.body);
+      const { message, user, token, browserName, deviceType } = response.data;
+      req.session = { jwt: token };
+      res.status(StatusCodes.OK).json({ message, user, browserName, deviceType });
+    } catch (error: any) {
+      const statusCode = error.response?.status || error.response?.data?.error?.statusCode || 500;
 
-    res.status(StatusCodes.OK).json({ message: response.data.message, user: response.data.user });
+      const response = error.response?.data || {
+        message: 'Authentication service error'
+      };
+
+      res.status(statusCode).json(response);
+    }
   }
 }

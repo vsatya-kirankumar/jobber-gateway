@@ -1,0 +1,21 @@
+import { Router } from 'express';
+import express from 'express';
+import { Get } from '@gateway/controllers/users/buyers/get';
+
+class BuyerRoutes {
+  private router: Router;
+
+  constructor() {
+    this.router = express.Router();
+  }
+
+  public routes(): Router {
+    this.router.get('/buyer/email', Get.prototype.email);
+    this.router.get('/buyer/username', Get.prototype.currentUserName);
+    this.router.get('/buyer/:username', Get.prototype.username);
+
+    return this.router;
+  }
+}
+
+export const buyerRoutes: BuyerRoutes = new BuyerRoutes();

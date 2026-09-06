@@ -16,6 +16,7 @@ export class AxiosService {
     }
     const instance: ReturnType<typeof axios.create> = axios.create({
       baseURL: baseUrl,
+      timeout: 5000,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

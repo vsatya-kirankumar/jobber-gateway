@@ -5,9 +5,18 @@ import { authService } from '@gateway/services/api/auth.service';
 
 export class Signup {
   public async create(req: Request, res: Response): Promise<void> {
-    const response: AxiosResponse = await authService.signUp(req.body);
-    req.session = { jwt: response.data.token };
+    try {
+      const response: AxiosResponse = await authService.signUp(req.body);
+      req.session = { jwt: response.data.token };
+      res.status(StatusCodes.CREATED).json({ message: response.data.message, user: response.data.user });
+    } catch (error: any) {
+      const statusCode = error.response?.status || error.response?.data?.error?.statusCode || 500;
 
-    res.status(StatusCodes.CREATED).json({ message: response.data.message, user: response.data.user });
+      const response = error.response?.data || {
+        message: 'Authentication service error'
+      };
+
+      res.status(statusCode).json(response);
+    }
   }
 }
