@@ -1,11 +1,11 @@
 import { Application } from 'express';
-import { authRoutes } from 'src/routes/auth.routes';
-import { currentUserRoutes } from 'src/routes/current-user.routes';
-import { healthRoutes } from 'src/routes/health.routes';
+import { authRoutes } from '@gateway/routes/auth.routes';
+import { currentUserRoutes } from '@gateway/routes/current-user.routes';
+import { healthRoutes } from '@gateway/routes/health.routes';
 import { authMiddleware } from '@gateway/services/auth-middleware';
-import { searchRoutes } from 'src/routes/search.routes';
-import { buyerRoutes } from 'src/routes/buyer.routes';
-import { sellerRoutes } from 'src/routes/seller.routes';
+import { searchRoutes } from '@gateway/routes/search.routes';
+import { buyerRoutes } from '@gateway/routes/buyer.routes';
+import { sellerRoutes } from '@gateway/routes/seller.routes';
 import { gigRoutes } from './routes/gig.routes';
 
 const BASE_PATH = '/api/gateway/v1';

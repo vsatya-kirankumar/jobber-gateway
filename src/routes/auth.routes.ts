@@ -3,8 +3,8 @@ import express from 'express';
 import { Signup } from '@gateway/controllers/auth/signup';
 import { Signin } from '@gateway/controllers/auth/signin';
 import { VerifyEmail } from '@gateway/controllers/auth/verify-email';
-import { Password } from 'src/controllers/auth/password';
-import { AuthSeed } from 'src/controllers/auth/seed';
+import { Password } from '@gateway/controllers/auth/password';
+import { AuthSeed } from '@gateway/controllers/auth/seed';
 
 class AuthRoutes {
   private router: Router;

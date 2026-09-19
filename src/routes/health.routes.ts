@@ -1,5 +1,5 @@
 import express, {Router} from 'express';
-import { Health } from 'src/controllers/health';
+import { Health } from '@gateway/controllers/health';
 
 class HealthRoutes {
   private router: Router;

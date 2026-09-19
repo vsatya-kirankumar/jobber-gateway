@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { gigService } from 'src/services/api/gig.service';
+import { gigService } from '@gateway/services/api/gig.service';
 
 export class Get {
   public async gigById(req: Request, res: Response): Promise<void> {

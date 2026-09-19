@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { gigService } from 'src/services/api/gig.service';
+import { gigService } from '@gateway/services/api/gig.service';
 import { AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
