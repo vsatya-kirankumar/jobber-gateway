@@ -4,8 +4,9 @@ import { appRoutes } from '@gateway/routes';
 import { axiosAuthInstance } from '@gateway/services/api/auth.service';
 import { axiosBuyerInstance } from '@gateway/services/api/buyer.service';
 import { axiosGigInstance } from '@gateway/services/api/gig.service';
+import { axiosChatInstance } from '@gateway/services/api/message.service';
 import { axiosSellerInstance } from '@gateway/services/api/seller.service';
-import { SocketIOHandler } from '@gateway/sockets/socket';
+import { SocketIOAppHandler } from '@gateway/sockets/socket';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { CustomError, IErrorResponse, winstonLogger } from '@vsatya-kirankumar/jobber-shared';
 import compression from 'compression';
@@ -70,6 +71,7 @@ export class GatewayServer {
         axiosBuyerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
         axiosSellerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
         axiosGigInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosChatInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
       }
       next();
     });
@@ -148,7 +150,7 @@ export class GatewayServer {
   }
 
   private socketIOConnection(io: Server): void {
-    const socketIOApp = new SocketIOHandler(io);
+    const socketIOApp = new SocketIOAppHandler(io);
     socketIOApp.listen();
   }
 }

@@ -6,7 +6,8 @@ import { authMiddleware } from '@gateway/services/auth-middleware';
 import { searchRoutes } from '@gateway/routes/search.routes';
 import { buyerRoutes } from '@gateway/routes/buyer.routes';
 import { sellerRoutes } from '@gateway/routes/seller.routes';
-import { gigRoutes } from './routes/gig.routes';
+import { gigRoutes } from '@gateway/routes/gig.routes';
+import { messageRoutes } from '@gateway/routes/message.routes';
 
 const BASE_PATH = '/api/gateway/v1';
 
@@ -20,4 +21,5 @@ export const appRoutes = (app: Application): void => {
   app.use(BASE_PATH, authMiddleware.verifyUser, buyerRoutes.routes());
   app.use(BASE_PATH, authMiddleware.verifyUser, sellerRoutes.routes());
   app.use(BASE_PATH, authMiddleware.verifyUser, gigRoutes.routes());
+  app.use(BASE_PATH, authMiddleware.verifyUser, messageRoutes.routes());
 };

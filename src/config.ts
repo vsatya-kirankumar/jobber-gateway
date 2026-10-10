@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({});
 
 class Config {
   public JWT_TOKEN: string | undefined;

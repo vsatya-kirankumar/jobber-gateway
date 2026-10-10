@@ -1,5 +1,4 @@
-import { Router } from 'express';
-import express from 'express';
+import express, { Router } from 'express';
 import { createGig } from '@gateway/controllers/gig/create';
 import { Delete } from '@gateway/controllers/gig/delete';
 import { authMiddleware } from '@gateway/services/auth-middleware';
