@@ -2,10 +2,11 @@ import { Server, Socket } from 'socket.io';
 import { io, Socket as SocketClient } from 'socket.io-client';
 import { GatewayCache } from '@gateway/redis/gateway.cache';
 import { config } from '@gateway/config';
-import { IMessageDocument, winstonLogger } from '@vsatya-kirankumar/jobber-shared';
+import { IMessageDocument, IOrderDocument, IOrderNotifcation, winstonLogger } from '@vsatya-kirankumar/jobber-shared';
 import { Logger } from 'winston';
 
 let chatSocketClient: SocketClient;
+let orderSocketClient: SocketClient;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'gatewaySocket', 'debug');
 
 export class SocketIOAppHandler {
@@ -16,6 +17,7 @@ export class SocketIOAppHandler {
     this.io = io;
     this.gatewayCache = new GatewayCache();
     this.chatSocketServiceIOConnection();
+    this.orderSocketServiceIOConnection();
   }
 
   public listen(): void {
@@ -68,6 +70,31 @@ export class SocketIOAppHandler {
 
     chatSocketClient.on('message updated', (data: IMessageDocument) => {
       this.io.emit('message updated', data);
+    });
+  }
+
+  private orderSocketServiceIOConnection(): void {
+    orderSocketClient = io(`${config.ORDER_BASE_URL}`, {
+      transports: ['websocket', 'polling'],
+      secure: true
+    });
+
+    orderSocketClient.on('connect', () => {
+      log.info('OrderService socket connected: ', orderSocketClient.connected);
+    });
+
+    orderSocketClient.on('disconnect', (reason: SocketClient.DisconnectReason) => {
+      log.log('error', 'OrderSocket disconnect reason:', reason.toString());
+      orderSocketClient.connect();
+    });
+
+    orderSocketClient.on('connect_error', (error: Error) => {
+      log.log('error', 'OrderService socket connection error:', error);
+      orderSocketClient.connect();
+    });
+
+    orderSocketClient.on('order notification', (order: IOrderDocument, notification: IOrderNotifcation) => {
+      this.io.emit('order received', order, notification);
     });
   }
 }

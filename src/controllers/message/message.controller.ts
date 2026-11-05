@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Request, Response, response } from 'express';
+import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { chatService } from 'src/services/api/message.service';
 
@@ -42,11 +42,8 @@ export class Message {
   }
 
   public async markMultipleMessages(req: Request, res: Response): Promise<void> {
-    const response: AxiosResponse = await chatService.markMultipleMessagesAsRead(
-      req.body.messageId,
-      req.body.senderUsername,
-      req.body.receiverUsername
-    );
+    const { messageId, senderUsername, receiverUsername } = req.body;
+    const response: AxiosResponse = await chatService.markMultipleMessagesAsRead(messageId, senderUsername, receiverUsername);
     res.status(StatusCodes.OK).json({ message: response.data.message });
   }
 }
